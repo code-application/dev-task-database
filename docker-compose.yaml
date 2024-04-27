@@ -1,0 +1,56 @@
+version: "3.8"
+
+x-template: &flyway-template
+  depends_on:
+    - postgres
+  image: redgate/flyway:10.11.1-alpine
+  platform: linux/amd64
+  volumes:
+    - ./sql:/flyway/sql
+    - ./config:/flyway/conf
+  env_file:
+    - env/local.env
+
+services:
+  flyway-clean:
+    <<: *flyway-template
+    command: clean
+
+  flyway-migrate:
+    <<: *flyway-template
+    command: migrate
+
+  flyway-info:
+    <<: *flyway-template
+    command: info
+
+  flyway-repair:
+    <<: *flyway-template
+    command: repair
+
+  postgres:
+    container_name: postgres
+    image: postgres:14.11-alpine3.19
+    environment:
+      - POSTGRES_DB=devtask_db
+    env_file:
+      # 引数で何も指定しなかったらローカルプロファイルで起動する
+      - env/local.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+      - ./config/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./init:/docker-entrypoint-initdb.d
+    restart: always
+
+  pgadmin:
+    depends_on:
+      - postgres
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    env_file:
+      - env/local.env
+    restart: always

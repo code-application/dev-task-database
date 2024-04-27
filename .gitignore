@@ -1,0 +1,7 @@
+env/*
+
+# PosgreSQL
+postgres_data/
+
+!.gitkeep
+# .gitkeepを一番下に配置したいため、これより下に記述しないこと
