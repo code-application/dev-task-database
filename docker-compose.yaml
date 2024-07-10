@@ -33,14 +33,17 @@ services:
     image: postgres:14.11-alpine3.19
     environment:
       - POSTGRES_DB=devtask_db
+      - POSTGRES_INITDB_ARGS="--encoding=UTF-8"
+    command: postgres -c config_file="/etc/postgresql/postgresql.conf"
     env_file:
       # 引数で何も指定しなかったらローカルプロファイルで起動する
       - env/local.env
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
       - ./config/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./config/pg_hba.conf:/etc/postgresql/pg_hba.conf
       - ./init:/docker-entrypoint-initdb.d
     restart: always
 
